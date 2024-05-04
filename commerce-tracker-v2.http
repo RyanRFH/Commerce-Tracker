@@ -1,0 +1,6 @@
+@commerce_tracker_v2_HostAddress = http://localhost:5161
+
+GET {{commerce_tracker_v2_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
