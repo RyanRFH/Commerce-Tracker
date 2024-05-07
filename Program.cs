@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using commerce_tracker_v2.Data;
 using dotnet_backend.Models;
 using Microsoft.AspNetCore.Identity;
@@ -11,7 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
         options.UseSqlServer(Environment.GetEnvironmentVariable("CONNECTION_STRING"))
     );
 
-    builder.Services.AddControllers();
+    builder.Services.AddControllers()
+        .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve); //Prevents cyclical returns from many to many relationships
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
 

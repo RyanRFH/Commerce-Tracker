@@ -16,7 +16,6 @@ namespace dotnet_backend.Models
         public int Quantity { get; set; }
         public double Price { get; set; }
         public string ImageUrl { get; set; } = string.Empty;
-        // public List<OrderProduct> OrderProduct { get; set; }
         public List<Order> Orders { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
