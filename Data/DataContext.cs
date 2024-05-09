@@ -39,23 +39,6 @@ namespace commerce_tracker_v2.Data
                 entity.HasKey(o => o.ProductId);
             });
 
-            // modelBuilder.Entity<OrderProduct>(entity =>
-            // {
-            //     entity.HasKey(op => new { op.OrderId, op.ProductId });
-
-            //     //MANY TO MANY RELATIONSHIP WITH A JOIN TABLE
-            //     entity.HasOne(op => op.Order)
-            //         .WithMany(op => op.OrderProduct)
-            //         .HasForeignKey(op => op.OrderId)
-            //         .OnDelete(DeleteBehavior.NoAction);
-
-            //     entity.HasOne(op => op.Product)
-            //         .WithMany(op => op.OrderProduct)
-            //         .HasForeignKey(op => op.ProductId)
-            //         .OnDelete(DeleteBehavior.NoAction);
-            //     //MANY TO MANY RELATIONSHIP WITH A JOIN TABLE
-            // });
-
             List<IdentityRole> roles = new List<IdentityRole>
             {
                 new IdentityRole
@@ -67,9 +50,18 @@ namespace commerce_tracker_v2.Data
                 {
                     Name = "User",
                     NormalizedName = "USER"
+                },
+                new IdentityRole
+                {
+                    Name = "Test",
+                    NormalizedName = "TEST"
                 }
             };
+
             modelBuilder.Entity<IdentityRole>().HasData(roles);
+
+
+
         }
 
 

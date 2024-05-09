@@ -17,5 +17,8 @@ namespace commerce_tracker_v2.Dto.AccountDtos
 
         [Required]
         public string? Password { get; set; }
+
+        [Required]
+        public string Role { get; set; } = "User";
     }
 }

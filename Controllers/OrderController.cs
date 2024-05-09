@@ -102,8 +102,8 @@ namespace commerce_tracker_v2.Controllers
 
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateOrder([FromBody] OrderCreateDto request, string orderId)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteOrder([FromBody] string id)
         {
 
             if (!ModelState.IsValid)
@@ -111,46 +111,58 @@ namespace commerce_tracker_v2.Controllers
                 return BadRequest(ModelState);
             }
 
-            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId);
+            var order = await _context.Orders.FirstOrDefaultAsync(p => p.OrderId == id);
 
             if (order == null)
             {
-                return NotFound("Order not found: " + orderId);
+                return NotFound("Order does not exist: " + id);
             }
 
-            var user = await _context.Users
-                .Where(u => u.Id == request.UserId)
-                .FirstOrDefaultAsync();
-
-            if (user == null)
-            {
-                return NotFound("User not found:" + request.UserId);
-            }
-
-            var requestProductIds = request.ProductsIds;
-
-            var allProductIds = _context.Products.Select(p => p.ProductId).ToList();
-
-            List<Product> requestProducts = new List<Product>();
-
-            foreach (string Id in requestProductIds)
-            {
-                if (!allProductIds.Contains(Id))
-                {
-                    return NotFound("Product Id not found in database: " + Id);
-                }
-
-                var currentProduct = _context.Products.FirstOrDefault(p => p.ProductId == Id);
-                requestProducts.Add(currentProduct);
-            }
-
-            // order.UserId = request.UserId;
-            order.Products = requestProducts;
+            _context.Orders.Remove(order);
 
             await _context.SaveChangesAsync();
 
             return Ok(order);
         }
+
+
+        // [HttpPut]
+        // public async Task<IActionResult> UpdateOrder([FromBody] List<string> productIds, string orderId)
+        // {
+
+        //     if (!ModelState.IsValid)
+        //     {
+        //         return BadRequest(ModelState);
+        //     }
+
+        //     var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId);
+
+        //     if (order == null)
+        //     {
+        //         return NotFound("Order not found: " + orderId);
+        //     }
+
+        //     var allProductIds = _context.Products.Select(p => p.ProductId).ToList();
+
+        //     List<Product> requestProducts = new List<Product>();
+
+        //     foreach (string Id in productIds)
+        //     {
+        //         if (!allProductIds.Contains(Id))
+        //         {
+        //             return NotFound("Product Id not found in database: " + Id);
+        //         }
+
+        //         var currentProduct = _context.Products.FirstOrDefault(p => p.ProductId == Id);
+        //         requestProducts.Add(currentProduct);
+        //     }
+
+        //     order.Products = requestProducts;
+
+        //     await _context.SaveChangesAsync();
+
+        //     return Ok(order);
+        // }
 
 
 
