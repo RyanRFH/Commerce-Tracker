@@ -17,11 +17,13 @@ namespace commerce_tracker_v2.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly ITokenService _tokenService;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
             _tokenService = tokenService;
         }
 
@@ -43,34 +45,79 @@ namespace commerce_tracker_v2.Controllers
 
                 var createdUser = await _userManager.CreateAsync(user, request.Password);
 
+                //Claims test
+                //Claims are used to add key/values to the user (some data keys are not included in the microsoft IdentityUser model,
+                //such as firstname and lastname)
                 var newClaims = new List<Claim>
                 {
-                    new("Email", request.Email)
+                    new("Email", request.Email) //For testing
+                    // new("FirstName", request.FirstName)
+                    // new("LastName", request.LastName)
                 };
 
                 await _userManager.AddClaimsAsync(user, newClaims);
 
                 if (createdUser.Succeeded)
                 {
-                    var createdRole = await _userManager.AddToRoleAsync(user, "User");
-
-                    if (createdRole.Succeeded)
+                    if (request.Role == "User")
                     {
-                        newClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
+                        var role = await _roleManager.FindByNameAsync("User");
+                        if (role == null)
+                        {
+                            role = new IdentityRole("User");
+                            await _roleManager.CreateAsync(role);
+                        }
+                        var createdRole = await _userManager.AddToRoleAsync(user, "User");
 
-                        return Ok(
-                            new NewUserDto
-                            {
-                                UserName = user.UserName,
-                                Email = user.Email,
-                                // Token = _tokenService.CreateToken(appUser)
-                            }
-                        );
+                        if (createdRole.Succeeded)
+                        {
+                            newClaims.Add(new Claim(ClaimTypes.Role, "User"));
+
+                            return Ok(
+                                new NewUserDto
+                                {
+                                    UserName = user.UserName,
+                                    Email = user.Email,
+                                    Token = _tokenService.CreateToken(user)
+                                }
+                            );
+                        }
+                        else
+                        {
+                            return StatusCode(500, createdRole.Errors);
+                        }
+
+                    }
+                    else if (request.Role == "Admin")
+                    {
+                        var createdRole = await _userManager.AddToRoleAsync(user, "Admin");
+
+                        if (createdRole.Succeeded)
+                        {
+                            newClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
+
+                            return Ok(
+                                new NewUserDto
+                                {
+                                    UserName = user.UserName,
+                                    Email = user.Email,
+                                    Token = _tokenService.CreateToken(user)
+                                }
+                            );
+                        }
+                        else
+                        {
+                            return StatusCode(500, createdRole.Errors);
+                        }
+
                     }
                     else
                     {
-                        return StatusCode(500, createdRole.Errors);
+                        return BadRequest("Invalud user role");
                     }
+
+
+
                 }
                 else
                 {

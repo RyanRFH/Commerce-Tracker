@@ -6,6 +6,7 @@ using commerce_tracker_v2.Data;
 using commerce_tracker_v2.Dto;
 using commerce_tracker_v2.Helpers;
 using dotnet_backend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,6 +25,7 @@ namespace commerce_tracker_v2.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = "User")]
         public async Task<IActionResult> CreateProduct(ProductCreateDto request)
         {
 
