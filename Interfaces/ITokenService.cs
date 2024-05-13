@@ -8,6 +8,6 @@ namespace commerce_tracker_v2.Interfaces
 {
     public interface ITokenService
     {
-        string CreateToken(User user);
+        string CreateToken(User user, string userRole);
     }
 }

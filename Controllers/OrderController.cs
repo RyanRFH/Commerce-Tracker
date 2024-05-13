@@ -7,6 +7,7 @@ using commerce_tracker_v2.Dto;
 using commerce_tracker_v2.Helpers;
 using commerce_tracker_v2.Models;
 using dotnet_backend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -68,6 +69,7 @@ namespace commerce_tracker_v2.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetOrders([FromQuery] OrderQueryObject query)
         {
             if (!ModelState.IsValid)
@@ -103,6 +105,7 @@ namespace commerce_tracker_v2.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteOrder([FromBody] string id)
         {
 

@@ -22,13 +22,13 @@ namespace commerce_tracker_v2.Services
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SIGNING_KEY")));
         }
 
-        public string CreateToken(User user)
+        public string CreateToken(User user, string userRole)
         {
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.GivenName, user.UserName),
-                new Claim(ClaimTypes.Role, "User")
+                new Claim(ClaimTypes.Role, userRole)
             };
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);

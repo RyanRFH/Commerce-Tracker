@@ -25,7 +25,7 @@ namespace commerce_tracker_v2.Controllers
 
 
         [HttpPost]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateProduct(ProductCreateDto request)
         {
 
@@ -100,6 +100,7 @@ namespace commerce_tracker_v2.Controllers
 
 
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateProduct([FromBody] ProductCreateDto request, string Id)
         {
 
@@ -128,6 +129,7 @@ namespace commerce_tracker_v2.Controllers
 
 
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteProduct([FromBody] string id)
         {
 

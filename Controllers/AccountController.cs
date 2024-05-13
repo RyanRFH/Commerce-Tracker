@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using commerce_tracker_v2.Data;
 using commerce_tracker_v2.Dto.AccountDtos;
 using commerce_tracker_v2.Interfaces;
 using dotnet_backend.Models;
@@ -18,13 +20,15 @@ namespace commerce_tracker_v2.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly ITokenService _tokenService;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly DataContext _context;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService, RoleManager<IdentityRole> roleManager)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService, RoleManager<IdentityRole> roleManager, DataContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _tokenService = tokenService;
+            _context = context;
         }
 
         [HttpPost("register")]
@@ -36,6 +40,17 @@ namespace commerce_tracker_v2.Controllers
                 {
                     return BadRequest(ModelState);
                 }
+
+                //Check role exists
+                if (request.Role == "User" || request.Role == "Admin")
+                {
+
+                }
+                else
+                {
+                    return BadRequest("Invalid user role");
+                }
+
 
                 var user = new User
                 {
@@ -78,7 +93,7 @@ namespace commerce_tracker_v2.Controllers
                                 {
                                     UserName = user.UserName,
                                     Email = user.Email,
-                                    Token = _tokenService.CreateToken(user)
+                                    Token = _tokenService.CreateToken(user, request.Role)
                                 }
                             );
                         }
@@ -90,6 +105,12 @@ namespace commerce_tracker_v2.Controllers
                     }
                     else if (request.Role == "Admin")
                     {
+                        var role = await _roleManager.FindByNameAsync("Admin");
+                        if (role == null)
+                        {
+                            role = new IdentityRole("Admin");
+                            await _roleManager.CreateAsync(role);
+                        }
                         var createdRole = await _userManager.AddToRoleAsync(user, "Admin");
 
                         if (createdRole.Succeeded)
@@ -101,7 +122,7 @@ namespace commerce_tracker_v2.Controllers
                                 {
                                     UserName = user.UserName,
                                     Email = user.Email,
-                                    Token = _tokenService.CreateToken(user)
+                                    Token = _tokenService.CreateToken(user, request.Role)
                                 }
                             );
                         }
@@ -113,11 +134,8 @@ namespace commerce_tracker_v2.Controllers
                     }
                     else
                     {
-                        return BadRequest("Invalud user role");
+                        return BadRequest("Invalid user role");
                     }
-
-
-
                 }
                 else
                 {
@@ -139,6 +157,8 @@ namespace commerce_tracker_v2.Controllers
                 return BadRequest(ModelState);
             }
 
+
+
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username.ToLower());
 
             if (user == null)
@@ -153,12 +173,26 @@ namespace commerce_tracker_v2.Controllers
                 return Unauthorized("Information incorrect");
             }
 
+            List<string> userRolesIds = _context.UserRoles.Where(ur => ur.UserId == user.Id).Select(ur => ur.RoleId).ToList();
+
+            List<string> userRoles = new List<string>();
+            if (userRolesIds != null)
+            {
+
+                foreach (var roleId in userRolesIds)
+                {
+                    var role = await _roleManager.FindByIdAsync(roleId);
+                    userRoles.Add(role.Name);
+                };
+
+            }
+
             return Ok(
                 new NewUserDto
                 {
                     UserName = user.UserName,
                     Email = user.Email,
-                    Token = _tokenService.CreateToken(user)
+                    Token = _tokenService.CreateToken(user, userRoles[0]) //Accounts should only have one role at present so only sending one
                 }
             );
 
