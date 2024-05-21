@@ -13,8 +13,16 @@ var builder = WebApplication.CreateBuilder(args);
 {
     DotNetEnv.Env.Load();
 
+    var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
+    var dbName = Environment.GetEnvironmentVariable("DB_NAME");
+    var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+    var connectionString = $"Data Source={dbHost};Initial Catalog={dbName};User ID=sa;Password={dbPassword};TrustServerCertificate=True;";
+    // Console.WriteLine(connectionString);
+
+
     builder.Services.AddDbContext<DataContext>(options =>
-        options.UseSqlServer(Environment.GetEnvironmentVariable("CONNECTION_STRING"))
+    options.UseSqlServer(Environment.GetEnvironmentVariable("CONNECTION_STRING"))
+    // options.UseSqlServer(connectionString)
     );
 
     builder.Services.AddControllers()
@@ -76,12 +84,15 @@ var builder = WebApplication.CreateBuilder(args);
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
+            // ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
+            ValidIssuer = "http://localhost:5246",
             ValidateAudience = true,
-            ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+            // ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+            ValidAudience = "http://localhost:5246",
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(
-                System.Text.Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SIGNING_KEY"))
+                // System.Text.Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SIGNING_KEY"))
+                System.Text.Encoding.UTF8.GetBytes("ko3ruirwr9wur9hwr89w47uhr94rh4w38rhgeg55e4ge5g5e4ge454etete4wrwrwrw3rw3r9rtwfs44sfhrtw")
             )
         };
     });
@@ -101,13 +112,13 @@ var app = builder.Build();
         app.UseSwagger();
         app.UseSwaggerUI();
     }
-    app.UseHttpsRedirection();
+    // app.UseHttpsRedirection();
 
     app.UseCors(x => x
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials()
-        // .WithOrigins("https://localhost:8080") //For Deployment
+        .WithOrigins("https://localhost:8001") //For Deployment
         .SetIsOriginAllowed(origin => true));
 
     app.UseAuthentication();

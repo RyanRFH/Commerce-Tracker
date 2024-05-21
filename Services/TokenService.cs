@@ -19,7 +19,8 @@ namespace commerce_tracker_v2.Services
         public TokenService(IConfiguration config)
         {
             _config = config;
-            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SIGNING_KEY")));
+            // _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SIGNING_KEY")));
+            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ko3ruirwr9wur9hwr89w47uhr94rh4w38rhgeg55e4ge5g5e4ge454etete4wrwrwrw3rw3r9rtwfs44sfhrtw"));
         }
 
         public string CreateToken(User user, string userRole)
@@ -38,8 +39,10 @@ namespace commerce_tracker_v2.Services
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.Now.AddDays(7),
                 SigningCredentials = creds,
-                Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
-                Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")
+                // Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
+                Issuer = "http://localhost:5246",
+                // Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")
+                Audience = "http://localhost:5246"
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();

@@ -3,6 +3,8 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+db-password.txt
+
 #Secrets
 Options/Authentication.cs
 

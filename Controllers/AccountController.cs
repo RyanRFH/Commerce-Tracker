@@ -93,6 +93,7 @@ namespace commerce_tracker_v2.Controllers
                                 {
                                     UserName = user.UserName,
                                     Email = user.Email,
+                                    Role = "User",
                                     Token = _tokenService.CreateToken(user, request.Role)
                                 }
                             );
@@ -122,6 +123,7 @@ namespace commerce_tracker_v2.Controllers
                                 {
                                     UserName = user.UserName,
                                     Email = user.Email,
+                                    Role = "Admin",
                                     Token = _tokenService.CreateToken(user, request.Role)
                                 }
                             );
@@ -150,7 +152,7 @@ namespace commerce_tracker_v2.Controllers
 
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDto loginDto)
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             if (!ModelState.IsValid)
             {
@@ -163,14 +165,14 @@ namespace commerce_tracker_v2.Controllers
 
             if (user == null)
             {
-                return Unauthorized("Information incorrect");
+                return Unauthorized(new { error = "Information Incorrect" });
             }
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
 
             if (!result.Succeeded)
             {
-                return Unauthorized("Information incorrect");
+                return Unauthorized(new { error = "Information Incorrect" });
             }
 
             List<string> userRolesIds = _context.UserRoles.Where(ur => ur.UserId == user.Id).Select(ur => ur.RoleId).ToList();
