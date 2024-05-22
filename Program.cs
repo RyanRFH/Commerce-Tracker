@@ -118,7 +118,7 @@ var app = builder.Build();
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials()
-        .WithOrigins("https://localhost:8001") //For Deployment
+        .WithOrigins("https://commerce-api-dotnet.azurewebsites.net/") //For Deployment
         .SetIsOriginAllowed(origin => true));
 
     app.UseAuthentication();
