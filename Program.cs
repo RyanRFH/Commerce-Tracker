@@ -13,16 +13,16 @@ var builder = WebApplication.CreateBuilder(args);
 {
     DotNetEnv.Env.Load();
 
-    var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
-    var dbName = Environment.GetEnvironmentVariable("DB_NAME");
-    var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
-    var connectionString = $"Data Source={dbHost};Initial Catalog={dbName};User ID=sa;Password={dbPassword};TrustServerCertificate=True;";
+    // var dbHost = Environment.GetEnvironmentVariable("DB_HOST");
+    // var dbName = Environment.GetEnvironmentVariable("DB_NAME");
+    // var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+    // var connectionString = $"Data Source={dbHost};Initial Catalog={dbName};User ID=sa;Password={dbPassword};TrustServerCertificate=True;";
     // Console.WriteLine(connectionString);
 
 
     builder.Services.AddDbContext<DataContext>(options =>
-    options.UseSqlServer(Environment.GetEnvironmentVariable("CONNECTION_STRING"))
-    // options.UseSqlServer(connectionString)
+    // options.UseSqlServer(Environment.GetEnvironmentVariable("CONNECTION_STRING"))
+    options.UseSqlServer(Environment.GetEnvironmentVariable("TESTING_CONNECTION_STRING"))
     );
 
     builder.Services.AddControllers()

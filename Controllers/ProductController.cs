@@ -76,14 +76,65 @@ namespace commerce_tracker_v2.Controllers
                 products = products.Where(p => p.Description.Contains(query.Description));
             }
 
+            if (query.CreatedAt.HasValue)
+            {
+                products = products.Where(p => p.CreatedAt >= query.CreatedAt);
+            }
+
             if (query.Quantity.HasValue)
             {
-                products = products.Where(p => p.Quantity == query.Quantity);
+                products = products.Where(p => p.Quantity > query.Quantity);
             }
 
             if (query.Price.HasValue)
             {
-                products = products.Where(p => p.Price == query.Price);
+                products = products.Where(p => p.Price < query.Price);
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.SortBy))
+            {
+                if (query.SortBy.Equals("Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    products = query.IsDescending
+                    ?
+                    products.OrderByDescending(p => p.Name)
+                    :
+                    products.OrderBy(p => p.Name);
+                }
+                else if (query.SortBy.Equals("Price", StringComparison.OrdinalIgnoreCase))
+                {
+                    products = query.IsDescending
+                    ?
+                    products.OrderByDescending(p => p.Price)
+                    :
+                    products.OrderBy(p => p.Price);
+                }
+                else if (query.SortBy.Equals("Quantity", StringComparison.OrdinalIgnoreCase))
+                {
+                    products = query.IsDescending
+                    ?
+                    products.OrderByDescending(p => p.Quantity)
+                    :
+                    products.OrderBy(p => p.Quantity);
+                }
+                else if (query.SortBy.Equals("CreationDate", StringComparison.OrdinalIgnoreCase))
+                {
+                    products = query.IsDescending
+                    ?
+                    products.OrderBy(p => p.CreatedAt)
+                    :
+                    products.OrderByDescending(p => p.CreatedAt);
+                }
+
+            }
+            else
+            {
+                //Sort by name as default
+                products = query.IsDescending
+                ?
+                products.OrderByDescending(p => p.Name)
+                :
+                products.OrderBy(p => p.Name);
             }
 
             int skipNumber = 0;
