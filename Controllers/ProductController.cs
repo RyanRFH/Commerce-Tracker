@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using commerce_tracker_v2.Data;
 using commerce_tracker_v2.Dto;
+using commerce_tracker_v2.Dto.ProductDtos;
 using commerce_tracker_v2.Helpers;
 using dotnet_backend.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -143,9 +144,20 @@ namespace commerce_tracker_v2.Controllers
                 skipNumber = (query.PageNumber - 1) * query.PageSize;
             }
 
+            var totalProductsCount = products.Count();
+
             var queriedProducts = await products.Skip(skipNumber).Take(query.PageSize).ToListAsync();
 
-            return Ok(queriedProducts);
+
+
+            var productsList = new ProductQueryResponseDto
+            {
+                ProductsList = queriedProducts,
+                PageNumber = query.PageNumber,
+                TotalProductCount = totalProductsCount
+            };
+
+            return Ok(productsList);
 
         }
 
