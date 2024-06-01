@@ -194,6 +194,7 @@ namespace commerce_tracker_v2.Controllers
                 {
                     UserName = user.UserName,
                     Email = user.Email,
+                    Role = userRoles[0],
                     Token = _tokenService.CreateToken(user, userRoles[0]) //Accounts should only have one role at present so only sending one
                 }
             );
