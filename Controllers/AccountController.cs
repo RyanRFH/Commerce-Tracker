@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO.Compression;
 using System.Linq;
 using System.Security.Claims;
@@ -203,6 +204,33 @@ namespace commerce_tracker_v2.Controllers
         }
 
 
+        [HttpGet("user")]
+        public async Task<IActionResult> GetUser([FromHeader] string userJWT)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            if (!tokenHandler.CanReadToken(userJWT))
+            {
+                return BadRequest("This is not a valid JWT");
+            }
+            var jwt = tokenHandler.ReadJwtToken(userJWT);
+
+            var claims = jwt.Claims;
+            var user = new
+            {
+                userName = claims.First(claim => claim.Type == "given_name").Value,
+                email = claims.First(claim => claim.Type == "email").Value,
+                role = claims.First(claim => claim.Type == "role").Value,
+                id = claims.First(claim => claim.Type == "user_id").Value,
+            };
+
+            return Ok(user);
+        }
 
 
     }

@@ -29,6 +29,7 @@ namespace commerce_tracker_v2.Services
             {
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.GivenName, user.UserName),
+                new Claim("user_id", user.Id),
                 new Claim(ClaimTypes.Role, userRole)
             };
 
