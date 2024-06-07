@@ -161,6 +161,49 @@ namespace commerce_tracker_v2.Controllers
 
         }
 
+        [HttpGet]
+        [Route("list")]
+        public async Task<IActionResult> GetProductsList([FromQuery] String queryType, String queryValues)
+        {
+            //Takes a query type and comma seperated list of values to query with
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var valueArray = queryValues.Split(',');
+
+            var products = _context.Products.Include(p => p.Orders).AsQueryable();
+
+            var productList = new List<Product>();
+
+            //ADD THE OTHER QUERY TYPES
+
+            if (queryType == "productid")
+            {
+                foreach (var value in valueArray)
+                {
+                    var product = products.FirstOrDefault(p => p.ProductId == value);
+
+                    if (product != null)
+                    {
+                        productList.Add(product);
+                    }
+                    else
+                    {
+                        return NotFound("A value was not found :" + value);
+                    }
+                }
+                return Ok(productList);
+            }
+            else
+            {
+                return BadRequest("Invalid query type");
+            }
+
+            return BadRequest("Internal server error");
+        }
+
 
         [HttpPut]
         [Authorize(Roles = "Admin")]
