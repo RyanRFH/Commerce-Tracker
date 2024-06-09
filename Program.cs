@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 {
@@ -20,8 +21,15 @@ var builder = WebApplication.CreateBuilder(args);
     // Console.WriteLine(connectionString);
 
 
+    // builder.Services.AddDbContext<DataContext>(options =>
+    // options.UseSqlServer(Environment.GetEnvironmentVariable("CONNECTION_STRING"))
+    // );
+
+    var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+    var serverVersion = new MySqlServerVersion(new Version(8, 0));
+    Console.WriteLine(serverVersion);
     builder.Services.AddDbContext<DataContext>(options =>
-    options.UseSqlServer(Environment.GetEnvironmentVariable("CONNECTION_STRING"))
+    options.UseMySql(connectionString, serverVersion)
     );
 
     builder.Services.AddControllers()

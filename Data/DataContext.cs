@@ -50,13 +50,15 @@ namespace commerce_tracker_v2.Data
                 {
                     Name = "User",
                     NormalizedName = "USER"
-                },
-                new IdentityRole
-                {
-                    Name = "Test",
-                    NormalizedName = "TEST"
                 }
             };
+
+            modelBuilder.Entity<IdentityRole>(entity =>
+            {
+                entity.Property(e => e.Name).HasMaxLength(256);
+                entity.Property(e => e.NormalizedName).HasMaxLength(256);
+                entity.Property(e => e.ConcurrencyStamp).HasMaxLength(256);
+            });
 
             modelBuilder.Entity<IdentityRole>().HasData(roles);
 
