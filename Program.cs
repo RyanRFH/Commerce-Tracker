@@ -91,11 +91,11 @@ var builder = WebApplication.CreateBuilder(args);
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
-            // ValidIssuer = "http://localhost:5246",
+            // ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
+            ValidIssuer = "http://localhost:5246",
             ValidateAudience = true,
-            ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
-            // ValidAudience = "http://localhost:5246",
+            // ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+            ValidAudience = "http://localhost:5246",
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(
                 // System.Text.Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SIGNING_KEY"))
