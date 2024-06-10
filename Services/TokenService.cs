@@ -40,10 +40,10 @@ namespace commerce_tracker_v2.Services
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.Now.AddDays(7),
                 SigningCredentials = creds,
-                // Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
-                Issuer = "http://localhost:5246",
-                // Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")
-                Audience = "http://localhost:5246"
+                Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
+                // Issuer = "http://localhost:5246",
+                Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")
+                // Audience = "http://localhost:5246"
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();

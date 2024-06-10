@@ -171,37 +171,38 @@ namespace commerce_tracker_v2.Controllers
                 return BadRequest(ModelState);
             }
 
+            if (string.IsNullOrEmpty(queryType) || string.IsNullOrEmpty(queryValues))
+            {
+                return BadRequest("Query type or values cannot be null or empty");
+            }
+
+            Console.WriteLine("product ID list at start = " + queryValues);
+
             var valueArray = queryValues.Split(',');
-
-            var products = _context.Products.Include(p => p.Orders).AsQueryable();
-
-            var productList = new List<Product>();
-
             //ADD THE OTHER QUERY TYPES
 
             if (queryType == "productid")
             {
-                foreach (var value in valueArray)
-                {
-                    var product = products.FirstOrDefault(p => p.ProductId == value);
+                var productIds = valueArray.Select(v => v.Trim()).ToList();
 
-                    if (product != null)
-                    {
-                        productList.Add(product);
-                    }
-                    else
-                    {
-                        return NotFound("A value was not found :" + value);
-                    }
-                }
-                return Ok(productList);
+                var products = await _context.Products
+                    .Include(p => p.Orders)
+                    .Where(p => productIds.Contains(p.ProductId))
+                    .ToListAsync();
+
+                if (products.Count != productIds.Count)
+                {
+                    var foundProductIds = products.Select(p => p.ProductId).ToHashSet();
+                    var notFoundIds = productIds.Where(id => !foundProductIds.Contains(id));
+                    return NotFound($"The following product IDs were not found: {string.Join(", ", notFoundIds)}");
+                };
+
+                return Ok(products);
             }
             else
             {
                 return BadRequest("Invalid query type");
             }
-
-            return BadRequest("Internal server error");
         }
 
 
