@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using commerce_tracker_v2.Data;
 
@@ -11,9 +12,11 @@ using commerce_tracker_v2.Data;
 namespace commerce_tracker_v2.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240620160105_AddingBaskets")]
+    partial class AddingBaskets
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,13 +54,13 @@ namespace commerce_tracker_v2.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "bd19ded9-6d83-4411-a58b-eab69d01cdf4",
+                            Id = "b6187b28-c364-47f7-8de5-9cfa8175186b",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "337015da-07b9-453c-8e80-1caf97d64d75",
+                            Id = "c9f6fa05-7195-4ce7-937b-0bb1262104af",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -408,13 +411,11 @@ namespace commerce_tracker_v2.Migrations
 
             modelBuilder.Entity("commerce_tracker_v2.Models.Basket", b =>
                 {
-                    b.HasOne("dotnet_backend.Models.User", "User")
+                    b.HasOne("dotnet_backend.Models.User", null)
                         .WithOne("Basket")
                         .HasForeignKey("commerce_tracker_v2.Models.Basket", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("commerce_tracker_v2.Models.BasketItem", b =>

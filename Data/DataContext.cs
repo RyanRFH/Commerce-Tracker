@@ -19,6 +19,8 @@ namespace commerce_tracker_v2.Data
 
         public DbSet<Order> Orders { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<Basket> Baskets { get; set; }
+
         // public DbSet<OrderProduct> OrderProducts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -33,6 +35,24 @@ namespace commerce_tracker_v2.Data
                     .WithMany(u => u.Orders)
                     .HasForeignKey(o => o.UserId);
             });
+
+            // modelBuilder.Entity<Basket>(entity =>
+            // {
+            //     entity.HasKey(b => b.BasketId);
+
+            //     entity.HasOne(b => b.User)
+            //         .WithOne(b => b.Basket);
+            // });
+
+            // modelBuilder.Entity<BasketItem>()
+            //     .HasOne(bi => bi.Basket)
+            //     .WithMany(b => b.BasketItems)
+            //     .HasForeignKey(bi => bi.BasketId);
+
+            // modelBuilder.Entity<BasketItem>()
+            //     .HasOne(bi => bi.Product)
+            //     .WithMany()
+            //     .HasForeignKey(bi => bi.ProductId);
 
             modelBuilder.Entity<Product>(entity =>
             {
