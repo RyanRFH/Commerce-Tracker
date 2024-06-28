@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using commerce_tracker_v2.Data;
 
@@ -11,9 +12,11 @@ using commerce_tracker_v2.Data;
 namespace commerce_tracker_v2.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240628135556_ChangingOrderToUseOrderItem")]
+    partial class ChangingOrderToUseOrderItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,13 +54,13 @@ namespace commerce_tracker_v2.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "45bb702d-537b-4983-a2a1-98f3e43e326c",
+                            Id = "f3ab1981-a086-413a-8e6b-4f9d71fb3ebb",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "4cbfee63-4c94-4a19-b87e-6d660feee92b",
+                            Id = "275001b2-0572-4878-a6db-61878c739ff7",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -233,7 +236,7 @@ namespace commerce_tracker_v2.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderItems");
+                    b.ToTable("OrderItem");
                 });
 
             modelBuilder.Entity("dotnet_backend.Models.Order", b =>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using commerce_tracker_v2.Data;
 using commerce_tracker_v2.Dto;
+using commerce_tracker_v2.Dto.OrderDtos;
 using commerce_tracker_v2.Helpers;
 using commerce_tracker_v2.Models;
 using dotnet_backend.Models;
@@ -25,8 +26,16 @@ namespace commerce_tracker_v2.Controllers
         }
 
         [HttpPost]
+        [Route("create")]
         public async Task<IActionResult> CreateOrder(OrderCreateDto request)
         {
+
+            //Create order from request data
+            var newOrder = new Order
+            {
+                UserId = request.UserId,
+            };
+
             var user = await _context.Users
                 .Where(u => u.Id == request.UserId)
                 .FirstOrDefaultAsync();
@@ -36,29 +45,36 @@ namespace commerce_tracker_v2.Controllers
                 return NotFound("User not found:" + request.UserId);
             }
 
-            var requestProductIds = request.ProductsIds;
+            // List<string> requestProductIds = request.ProductIds;
 
             var allProductIds = _context.Products.Select(p => p.ProductId).ToList();
 
-            List<Product> requestProducts = new List<Product>();
+            List<OrderItem> orderItems = new List<OrderItem>();
 
-            foreach (string Id in requestProductIds)
+            foreach (OrderItemCreateDto orderItemDto in request.OrderItemCreateDtos)
             {
-                if (!allProductIds.Contains(Id))
+                if (!allProductIds.Contains(orderItemDto.ProductId))
                 {
-                    return NotFound("Product Id not found in database: " + Id);
+                    return NotFound("Product Id not found in database: " + orderItemDto.ProductId);
                 }
 
-                var currentProduct = _context.Products.FirstOrDefault(p => p.ProductId == Id);
-                requestProducts.Add(currentProduct);
-            }
+                var currentProduct = _context.Products.FirstOrDefault(p => p.ProductId == orderItemDto.ProductId);
 
-            //Create order from request data
-            var newOrder = new Order
-            {
-                UserId = request.UserId,
-                Products = requestProducts
-            };
+                if (currentProduct == null)
+                {
+                    return NotFound("Product Id not found in database: " + orderItemDto.ProductId);
+                }
+
+                var currentOrderItem = new OrderItem
+                {
+                    OrderId = newOrder.OrderId,
+                    ProductId = currentProduct.ProductId,
+                    Quantity = orderItemDto.Quantity
+                };
+
+                _context.OrderItems.Add(currentOrderItem);
+                orderItems.Add(currentOrderItem);
+            }
 
             _context.Orders.Add(newOrder);
 
@@ -80,7 +96,7 @@ namespace commerce_tracker_v2.Controllers
             _context.ChangeTracker.LazyLoadingEnabled = false;
 
             //Using AsNoTracking so that products in the order dont include their respective orders list too, makes data hard to read/understand
-            var orders = _context.Orders.AsNoTracking().Include(p => p.Products).AsQueryable();
+            var orders = _context.Orders.AsNoTracking().Include(p => p.OrderItems).AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query.OrderId))
             {

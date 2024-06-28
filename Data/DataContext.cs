@@ -20,6 +20,7 @@ namespace commerce_tracker_v2.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Basket> Baskets { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
 
         // public DbSet<OrderProduct> OrderProducts { get; set; }
 
@@ -27,14 +28,27 @@ namespace commerce_tracker_v2.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Order>(entity =>
-            {
-                entity.HasKey(o => o.OrderId);
+            // modelBuilder.Entity<Order>(entity =>
+            // {
+            //     entity.HasKey(o => o.OrderId);
 
-                entity.HasOne(o => o.User)
-                    .WithMany(u => u.Orders)
-                    .HasForeignKey(o => o.UserId);
-            });
+            //     entity.HasOne(o => o.User)
+            //         .WithMany(u => u.Orders)
+            //         .HasForeignKey(o => o.UserId);
+
+            //     entity.HasMany(o => o.OrderItems)
+            //         .WithOne(oi => oi.Order)
+            //         .HasForeignKey(o => o.OrderId)
+            // });
+
+
+
+            // modelBuilder.Entity<OrderItem>(entity =>
+            // {
+            //     entity.HasKey(o => o.OrderId);
+
+            //     entity.HasOne(o => )
+            // })
 
             // modelBuilder.Entity<Basket>(entity =>
             // {

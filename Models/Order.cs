@@ -13,7 +13,7 @@ namespace dotnet_backend.Models
         public string OrderId { get; set; } = Guid.NewGuid().ToString();
         public string UserId { get; set; }
         public User User { get; set; }
-        public List<Product> Products { get; set; }
+        public List<OrderItem> OrderItems { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

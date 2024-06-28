@@ -189,6 +189,14 @@ namespace commerce_tracker_v2.Controllers
                 };
 
             }
+            else
+            {
+                return BadRequest("User does not have a role assigned");
+            }
+            if (userRoles.Count == 0)
+            {
+                return BadRequest("User does not have a role assigned");
+            }
 
             return Ok(
                 new NewUserDto
