@@ -74,6 +74,13 @@ namespace commerce_tracker_v2.Controllers
                 return BadRequest(ModelState);
             }
 
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
             var basket = await _context.Baskets.Include(b => b.BasketItems).ThenInclude(i => i.Product).FirstOrDefaultAsync(b => b.UserId == userId);
 
             if (basket == null)
@@ -87,6 +94,7 @@ namespace commerce_tracker_v2.Controllers
                 basket = newBasket;
 
             }
+
 
             // basket = await _context.Baskets.Include(b => b.BasketItems).ThenInclude(i => i.Product).FirstOrDefaultAsync(b => b.UserId == userId);
 

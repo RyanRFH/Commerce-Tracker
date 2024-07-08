@@ -12,8 +12,8 @@ using commerce_tracker_v2.Data;
 namespace commerce_tracker_v2.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240620165054_AddingBaskets2")]
-    partial class AddingBaskets2
+    [Migration("20240708145308_DbReset")]
+    partial class DbReset
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,8 +32,7 @@ namespace commerce_tracker_v2.Migrations
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .HasMaxLength(256)
@@ -50,20 +49,6 @@ namespace commerce_tracker_v2.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "bd19ded9-6d83-4411-a58b-eab69d01cdf4",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = "337015da-07b9-453c-8e80-1caf97d64d75",
-                            Name = "User",
-                            NormalizedName = "USER"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -172,21 +157,6 @@ namespace commerce_tracker_v2.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("OrderProduct", b =>
-                {
-                    b.Property<string>("OrdersOrderId")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("ProductsProductId")
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("OrdersOrderId", "ProductsProductId");
-
-                    b.HasIndex("ProductsProductId");
-
-                    b.ToTable("OrderProduct");
-                });
-
             modelBuilder.Entity("commerce_tracker_v2.Models.Basket", b =>
                 {
                     b.Property<string>("BasketId")
@@ -229,6 +199,31 @@ namespace commerce_tracker_v2.Migrations
                     b.ToTable("BasketItem");
                 });
 
+            modelBuilder.Entity("commerce_tracker_v2.Models.OrderItem", b =>
+                {
+                    b.Property<string>("OrderItemId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("OrderId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("ProductId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("OrderItemId");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("OrderItems");
+                });
+
             modelBuilder.Entity("dotnet_backend.Models.Order", b =>
                 {
                     b.Property<string>("OrderId")
@@ -237,11 +232,16 @@ namespace commerce_tracker_v2.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("ProductId")
+                        .HasColumnType("varchar(255)");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
                     b.HasKey("OrderId");
+
+                    b.HasIndex("ProductId");
 
                     b.HasIndex("UserId");
 
@@ -394,21 +394,6 @@ namespace commerce_tracker_v2.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("OrderProduct", b =>
-                {
-                    b.HasOne("dotnet_backend.Models.Order", null)
-                        .WithMany()
-                        .HasForeignKey("OrdersOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("dotnet_backend.Models.Product", null)
-                        .WithMany()
-                        .HasForeignKey("ProductsProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("commerce_tracker_v2.Models.Basket", b =>
                 {
                     b.HasOne("dotnet_backend.Models.User", "User")
@@ -439,8 +424,31 @@ namespace commerce_tracker_v2.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("commerce_tracker_v2.Models.OrderItem", b =>
+                {
+                    b.HasOne("dotnet_backend.Models.Order", "Order")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("dotnet_backend.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("dotnet_backend.Models.Order", b =>
                 {
+                    b.HasOne("dotnet_backend.Models.Product", null)
+                        .WithMany("Orders")
+                        .HasForeignKey("ProductId");
+
                     b.HasOne("dotnet_backend.Models.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
@@ -453,6 +461,16 @@ namespace commerce_tracker_v2.Migrations
             modelBuilder.Entity("commerce_tracker_v2.Models.Basket", b =>
                 {
                     b.Navigation("BasketItems");
+                });
+
+            modelBuilder.Entity("dotnet_backend.Models.Order", b =>
+                {
+                    b.Navigation("OrderItems");
+                });
+
+            modelBuilder.Entity("dotnet_backend.Models.Product", b =>
+                {
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("dotnet_backend.Models.User", b =>

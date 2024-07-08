@@ -17,10 +17,12 @@ namespace commerce_tracker_v2.Data
 
         }
 
-        public DbSet<Order> Orders { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<Basket> Baskets { get; set; }
+        public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<Basket> Baskets { get; set; }
+        public DbSet<Basket> BasketItems { get; set; }
+
 
         // public DbSet<OrderProduct> OrderProducts { get; set; }
 
@@ -38,7 +40,7 @@ namespace commerce_tracker_v2.Data
 
             //     entity.HasMany(o => o.OrderItems)
             //         .WithOne(oi => oi.Order)
-            //         .HasForeignKey(o => o.OrderId)
+            //         .HasForeignKey(o => o.OrderId);
             // });
 
 
