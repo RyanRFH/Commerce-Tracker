@@ -24,7 +24,7 @@ namespace commerce_tracker_v2.Data
 
         // public DbSet<OrderProduct> OrderProducts { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override async void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
@@ -68,33 +68,33 @@ namespace commerce_tracker_v2.Data
             //     .WithMany()
             //     .HasForeignKey(bi => bi.ProductId);
 
-            modelBuilder.Entity<Product>(entity =>
-            {
-                entity.HasKey(o => o.ProductId);
-            });
+            // modelBuilder.Entity<Product>(entity =>
+            // {
+            //     entity.HasKey(o => o.ProductId);
+            // });
 
-            List<IdentityRole> roles = new List<IdentityRole>
-            {
-                new IdentityRole
-                {
-                    Name = "Admin",
-                    NormalizedName = "ADMIN"
-                },
-                new IdentityRole
-                {
-                    Name = "User",
-                    NormalizedName = "USER"
-                }
-            };
+            // List<IdentityRole> roles = new List<IdentityRole>
+            // {
+            //     new IdentityRole
+            //     {
+            //         Name = "Admin",
+            //         NormalizedName = "ADMIN"
+            //     },
+            //     new IdentityRole
+            //     {
+            //         Name = "User",
+            //         NormalizedName = "USER"
+            //     }
+            // };
 
-            modelBuilder.Entity<IdentityRole>(entity =>
-            {
-                entity.Property(e => e.Name).HasMaxLength(256);
-                entity.Property(e => e.NormalizedName).HasMaxLength(256);
-                entity.Property(e => e.ConcurrencyStamp).HasMaxLength(256);
-            });
+            // modelBuilder.Entity<IdentityRole>(entity =>
+            // {
+            //     entity.Property(e => e.Name).HasMaxLength(256);
+            //     entity.Property(e => e.NormalizedName).HasMaxLength(256);
+            //     entity.Property(e => e.ConcurrencyStamp).HasMaxLength(256);
+            // });
 
-            modelBuilder.Entity<IdentityRole>().HasData(roles);
+            // modelBuilder.Entity<IdentityRole>().HasData(roles);
 
 
 

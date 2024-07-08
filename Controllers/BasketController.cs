@@ -84,9 +84,17 @@ namespace commerce_tracker_v2.Controllers
                 };
                 _context.Baskets.Add(newBasket);
                 await _context.SaveChangesAsync();
+                basket = newBasket;
+
             }
 
-            basket = await _context.Baskets.Include(b => b.BasketItems).ThenInclude(i => i.Product).FirstOrDefaultAsync(b => b.UserId == userId);
+            // basket = await _context.Baskets.Include(b => b.BasketItems).ThenInclude(i => i.Product).FirstOrDefaultAsync(b => b.UserId == userId);
+
+
+            if (basket == null)
+            {
+                return NotFound("Basket not found");
+            }
 
 
             var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == productId);
@@ -98,7 +106,7 @@ namespace commerce_tracker_v2.Controllers
 
             var basketItem = new BasketItem
             {
-                BasketItemId = basket.BasketId,
+                BasketId = basket.BasketId,
                 Product = product,
                 Quantity = quantity
             };
