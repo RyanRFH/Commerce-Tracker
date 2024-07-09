@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using commerce_tracker_v2.Data;
+using commerce_tracker_v2.Dto.BasketDtos;
 using commerce_tracker_v2.Models;
 using dotnet_backend.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +23,6 @@ namespace commerce_tracker_v2.Controllers
             _context = context;
         }
 
-        //TEST GET BASKET
         [HttpGet]
         // [Authorize]
         public async Task<IActionResult> GetBasket(string userId)
@@ -32,7 +32,8 @@ namespace commerce_tracker_v2.Controllers
                 return BadRequest(ModelState);
             }
 
-            var basket = await _context.Baskets.Include(b => b.BasketItems).ThenInclude(i => i.Product).FirstOrDefaultAsync(b => b.UserId.Equals(userId));
+
+            var basket = await _context.Baskets.AsNoTracking().Include(b => b.BasketItems).ThenInclude(i => i.Product).FirstOrDefaultAsync(b => b.UserId.Equals(userId));
 
             if (basket == null)
             {
@@ -67,27 +68,27 @@ namespace commerce_tracker_v2.Controllers
 
         [HttpPost]
         [Route("additem")]
-        public async Task<IActionResult> AddItemToBasket(string userId, string productId, int quantity)
+        public async Task<IActionResult> AddItemToBasket(AddItemToBasketDto newBasketItem)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == newBasketItem.UserId);
 
             if (user == null)
             {
                 return NotFound("User not found");
             }
 
-            var basket = await _context.Baskets.Include(b => b.BasketItems).ThenInclude(i => i.Product).FirstOrDefaultAsync(b => b.UserId == userId);
+            var basket = await _context.Baskets.Include(b => b.BasketItems).ThenInclude(i => i.Product).FirstOrDefaultAsync(b => b.UserId == newBasketItem.UserId);
 
             if (basket == null)
             {
                 var newBasket = new Basket
                 {
-                    UserId = userId
+                    UserId = newBasketItem.UserId
                 };
                 _context.Baskets.Add(newBasket);
                 await _context.SaveChangesAsync();
@@ -105,7 +106,7 @@ namespace commerce_tracker_v2.Controllers
             }
 
 
-            var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == productId);
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == newBasketItem.ProductId);
 
             if (product == null)
             {
@@ -116,7 +117,7 @@ namespace commerce_tracker_v2.Controllers
             {
                 BasketId = basket.BasketId,
                 Product = product,
-                Quantity = quantity
+                Quantity = newBasketItem.Quantity
             };
 
             basket.BasketItems.Add(basketItem);
@@ -125,6 +126,60 @@ namespace commerce_tracker_v2.Controllers
 
             return Ok(basket);
 
+        }
+
+        [HttpDelete]
+        [Route("removeitem")]
+        public async Task<IActionResult> RemoveItemFromBasket(string basketItemId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var basketItem = await _context.BasketItems.FirstOrDefaultAsync(bi => bi.BasketItemId == basketItemId);
+
+            if (basketItem == null)
+            {
+                return NotFound("Basket item not found");
+            }
+
+            _context.BasketItems.Remove(basketItem);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(basketItem);
+
+
+        }
+
+        [HttpDelete]
+        [Route("clearbasket")]
+        public async Task<IActionResult> ClearBasket(string userId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var basket = await _context.Baskets.FirstOrDefaultAsync(b => b.User.Id == userId);
+
+            if (basket == null)
+            {
+                return NotFound("User basket not found");
+            }
+
+            var basketItemIds = await _context.BasketItems.Where(bi => bi.BasketId == basket.BasketId).ToListAsync();
+
+            if (basketItemIds.Any())
+            {
+                // Remove all basket items
+                _context.BasketItems.RemoveRange(basketItemIds);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(userId);
         }
 
 
