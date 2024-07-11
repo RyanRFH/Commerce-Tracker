@@ -182,6 +182,38 @@ namespace commerce_tracker_v2.Controllers
             return Ok(userId);
         }
 
+        [HttpPut]
+        [Route("basketitem/updatequantity")]
+        public async Task<IActionResult> UpdateBasketItemQuantity(string basketItemId, int quantity)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
+            var basketItem = await _context.BasketItems.FirstOrDefaultAsync(bi => bi.BasketItemId == basketItemId);
+
+            if (quantity < 0)
+            {
+                return BadRequest("New basket item quantity must be more than 0");
+            }
+
+            if (basketItem == null)
+            {
+                return NotFound("Basket item not found");
+            }
+
+            basketItem.Quantity = quantity;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(basketItem);
+
+
+
+
+
+
+        }
     }
 }
