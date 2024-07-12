@@ -29,13 +29,7 @@ namespace commerce_tracker_v2.Controllers
         [Route("create")]
         public async Task<IActionResult> CreateOrder(OrderCreateDto request)
         {
-
             //Create order from request data
-            var newOrder = new Order
-            {
-                UserId = request.UserId,
-            };
-
             var user = await _context.Users
                 .Where(u => u.Id == request.UserId)
                 .FirstOrDefaultAsync();
@@ -44,6 +38,12 @@ namespace commerce_tracker_v2.Controllers
             {
                 return NotFound("User not found:" + request.UserId);
             }
+
+
+            var newOrder = new Order
+            {
+                UserId = request.UserId,
+            };
 
             // List<string> requestProductIds = request.ProductIds;
 
@@ -58,7 +58,7 @@ namespace commerce_tracker_v2.Controllers
                     return NotFound("Product Id not found in database: " + orderItemDto.ProductId);
                 }
 
-                var currentProduct = _context.Products.FirstOrDefault(p => p.ProductId == orderItemDto.ProductId);
+                var currentProduct = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == orderItemDto.ProductId);
 
                 if (currentProduct == null)
                 {
@@ -72,11 +72,11 @@ namespace commerce_tracker_v2.Controllers
                     Quantity = orderItemDto.Quantity
                 };
 
-                _context.OrderItems.Add(currentOrderItem);
+                await _context.OrderItems.AddAsync(currentOrderItem);
                 orderItems.Add(currentOrderItem);
             }
 
-            _context.Orders.Add(newOrder);
+            await _context.Orders.AddAsync(newOrder);
 
             await _context.SaveChangesAsync();
 
@@ -85,7 +85,7 @@ namespace commerce_tracker_v2.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        // [Authorize]
         public async Task<IActionResult> GetOrders([FromQuery] OrderQueryObject query)
         {
             if (!ModelState.IsValid)
@@ -96,7 +96,7 @@ namespace commerce_tracker_v2.Controllers
             _context.ChangeTracker.LazyLoadingEnabled = false;
 
             //Using AsNoTracking so that products in the order dont include their respective orders list too, makes data hard to read/understand
-            var orders = _context.Orders.AsNoTracking().Include(p => p.OrderItems).AsQueryable();
+            var orders = _context.Orders.AsNoTracking().Include(p => p.OrderItems).ThenInclude(oi => oi.Product).AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query.OrderId))
             {
@@ -143,6 +143,56 @@ namespace commerce_tracker_v2.Controllers
 
             return Ok(order);
         }
+
+        [HttpPost]
+        [Route("createfrombasket")]
+        public async Task<IActionResult> CreateOrderFromBasket(string userId)
+        {
+
+            //Create order from users basket
+            var user = await _context.Users.Where(u => u.Id == userId).FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                return NotFound("User not found:" + userId);
+            }
+
+            var newOrder = new Order
+            {
+                UserId = userId
+            };
+
+            var orderItems = new List<OrderItem>();
+
+            var basket = await _context.Baskets.Include(b => b.BasketItems).FirstOrDefaultAsync(b => b.UserId == userId);
+
+            if (basket == null)
+            {
+                return NotFound("Users basket not found");
+            }
+
+            foreach (var basketItem in basket.BasketItems)
+            {
+                var newOrderItem = new OrderItem
+                {
+                    OrderId = newOrder.OrderId,
+                    ProductId = basketItem.ProductId,
+                    Quantity = basketItem.Quantity
+                };
+
+                orderItems.Add(newOrderItem);
+                await _context.OrderItems.AddAsync(newOrderItem);
+            }
+            newOrder.OrderItems = orderItems;
+
+            await _context.Orders.AddAsync(newOrder);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(newOrder);
+
+        }
+
 
 
         // [HttpPut]
