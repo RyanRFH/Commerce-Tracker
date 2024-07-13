@@ -85,7 +85,7 @@ namespace commerce_tracker_v2.Controllers
         }
 
         [HttpGet]
-        // [Authorize]
+        [Authorize]
         public async Task<IActionResult> GetOrders([FromQuery] OrderQueryObject query)
         {
             if (!ModelState.IsValid)
