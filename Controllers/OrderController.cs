@@ -121,7 +121,7 @@ namespace commerce_tracker_v2.Controllers
         }
 
         [HttpDelete]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> DeleteOrder([FromBody] string id)
         {
 
