@@ -19,7 +19,8 @@ namespace commerce_tracker_v2.Services
         public TokenService(IConfiguration config)
         {
             _config = config;
-            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SIGNING_KEY")));
+            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ko3ruirwr9wur9hwr89w47uhr94rh4w38rhgeg55e4ge5g5e4ge454etete4wrwrwrw3rw3r9rtwfs44sfhrtw"));
+            // _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SIGNING_KEY")));
         }
 
         public string CreateToken(User user, string userRole)
