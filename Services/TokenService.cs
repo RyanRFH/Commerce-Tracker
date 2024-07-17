@@ -18,7 +18,6 @@ namespace commerce_tracker_v2.Services
 
         public TokenService(IConfiguration config)
         {
-            DotNetEnv.Env.Load();
             _config = config;
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SIGNING_KEY")));
         }
