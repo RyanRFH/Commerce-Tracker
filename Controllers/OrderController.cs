@@ -114,7 +114,7 @@ namespace commerce_tracker_v2.Controllers
                 skipNumber = (query.PageNumber - 1) * query.PageSize;
             }
 
-            var queriedOrders = await orders.Skip(skipNumber).Take(query.PageSize).ToListAsync();
+            var queriedOrders = await orders.ToListAsync();
 
             return Ok(queriedOrders);
 
